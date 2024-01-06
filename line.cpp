@@ -5,7 +5,7 @@
 #include <raymath.h>
 
 constexpr float STATION_RADIUS = 8;
-constexpr float INFLECTION_POINT_SPLINE_RADIUS = 30;
+constexpr float INFLECTION_POINT_SPLINE_RADIUS = 20;
 constexpr float CONNECTION_THICK = 5.0;
 constexpr float INFLECTION_BEZ_CONTROL_OFFSET = 20;
 
