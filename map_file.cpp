@@ -52,7 +52,7 @@ std::istream& operator>>(std::istream& is, Line& line) {
 }
 
 std::istream& operator>>(std::istream& is, Connection& conn) {
-   is >> conn.start >> conn.end;
+   is >> conn.logical_start_id >> conn.logical_end_id;
    TrackPointId id;
    while(is >> id) {
       conn.point_ids.push_back(id);
@@ -147,7 +147,7 @@ void save(Map const& map, std::ostream& out) {
 
    for(std::size_t i = 0; i < map.connections.size(); ++i) {
       auto& c = map.connections.at(i);
-      out << "connection." << i << " " << c.start << " " << c.end;
+      out << "connection." << i << " " << c.logical_start_id << " " << c.logical_end_id;
       for(auto point_id : c.point_ids) {
          out << " " << point_id;
       }

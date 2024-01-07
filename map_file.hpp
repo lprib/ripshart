@@ -11,8 +11,8 @@ namespace map {
 using Id = unsigned int;
 
 using NodeId = Id;
+using StationId = Id;
 using ConnectionId = Id;
-using StationNodeId = Id;
 using TrackPointId = Id;
 
 enum class StationStyle {
@@ -35,8 +35,8 @@ struct Line {
 };
 
 struct Connection {
-   StationNodeId start;
-   StationNodeId end;
+   StationId logical_start_id;
+   StationId logical_end_id;
    std::vector<TrackPointId> point_ids;
 };
 
