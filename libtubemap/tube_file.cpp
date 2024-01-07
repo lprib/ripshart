@@ -1,10 +1,10 @@
-#include "map_file.hpp"
+#include "tube_file.hpp"
 
 #include <cstdio>
 #include <sstream>
 #include <string>
 
-namespace map {
+namespace tube {
 
 std::istream& operator>>(std::istream& is, StationStyle& style) {
    std::string style_str;

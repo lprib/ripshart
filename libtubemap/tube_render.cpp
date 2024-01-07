@@ -1,9 +1,9 @@
-#include "map_render.hpp"
+#include "tube_render.hpp"
 
 #include "raylib.h"
 #include "raymath.h"
 
-namespace map {
+namespace tube {
 
 static void render_lines(Map const& map) {
    std::vector<int> connection_offset_counter(map.connections.size(), 0);
@@ -12,9 +12,7 @@ static void render_lines(Map const& map) {
       for(auto& conn_id : line.connection_ids) {
          auto& conn = map.connections[conn_id];
          if(conn.point_ids.size() > 1) {
-            Vector2 down;
-            down.x = 0;
-            down.y = 1;
+            Vector2 down{0, 1};
 
             auto offset = connection_offset_counter[conn_id] * 5;
             auto offset_vec = Vector2Scale(down, offset);

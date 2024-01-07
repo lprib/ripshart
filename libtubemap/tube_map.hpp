@@ -1,12 +1,8 @@
-#ifndef MAP_FILE_H
-#define MAP_FILE_H
+#ifndef TUBE_MAP_HPP
+#define TUBE_MAP_HPP
 
-#include <iostream>
 #include <vector>
-
 #include <raylib.h>
-
-namespace map {
 
 using Id = unsigned int;
 
@@ -52,10 +48,5 @@ struct Map {
    std::vector<Connection> connections;
    std::vector<TrackPoint> points;
 };
-
-Map load(std::istream& in);
-void save(Map const& map, std::ostream& out);
-
-} // namespace map
 
 #endif

@@ -7,15 +7,22 @@ set(RAYLIB_HEADER_FOLDER /usr/local/include CACHE PATH "Where to find raylib/rlg
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(ripshart_unshackled
-    main.cpp
-    line.cpp
-    line.hpp
-    map_file.hpp
-    map_file.cpp
-    map_render.hpp
-    map_render.cpp
+add_library(libtubemap
+    libtubemap/tube_file.cpp
+    libtubemap/tube_file.hpp
+    libtubemap/tube_map.hpp
+    libtubemap/tube_render.cpp
+    libtubemap/tube_render.hpp
 )
+target_link_libraries(libtubemap ${RAYLIB_STATIC_LIB_LOCATION})
+target_include_directories(libtubemap PUBLIC ${RAYLIB_HEADER_FOLDER})
+target_include_directories(libtubemap PUBLIC libtubemap)
 
-target_link_libraries(ripshart_unshackled ${RAYLIB_STATIC_LIB_LOCATION})
-target_include_directories(ripshart_unshackled PRIVATE ${RAYLIB_HEADER_FOLDER})
+add_executable(editor
+    editor/main.cpp
+)
+target_link_libraries(editor
+    ${RAYLIB_STATIC_LIB_LOCATION}
+    libtubemap
+)
+target_include_directories(editor PRIVATE ${RAYLIB_HEADER_FOLDER})
