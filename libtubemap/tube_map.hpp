@@ -1,8 +1,10 @@
 #ifndef TUBE_MAP_HPP
 #define TUBE_MAP_HPP
 
-#include <vector>
 #include <raylib.h>
+#include <vector>
+
+namespace tube {
 
 using Id = unsigned int;
 
@@ -48,5 +50,7 @@ struct Map {
    std::vector<Connection> connections;
    std::vector<TrackPoint> points;
 };
+
+} // namespace tube
 
 #endif
