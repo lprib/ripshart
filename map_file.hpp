@@ -1,5 +1,5 @@
-#ifndef MAPFILE_H
-#define MAPFILE_H
+#ifndef MAP_FILE_H
+#define MAP_FILE_H
 
 #include <iostream>
 #include <vector>
@@ -13,7 +13,7 @@ using Id = unsigned int;
 using NodeId = Id;
 using ConnectionId = Id;
 using StationNodeId = Id;
-using CornerId = Id;
+using TrackPointId = Id;
 
 enum class StationStyle {
    Circle,
@@ -37,10 +37,10 @@ struct Line {
 struct Connection {
    StationNodeId start;
    StationNodeId end;
-   std::vector<CornerId> corners;
+   std::vector<TrackPointId> point_ids;
 };
 
-struct Corner {
+struct TrackPoint {
    Vector2 pos;
    // radius?
 };
@@ -50,7 +50,7 @@ struct Map {
    std::vector<StationNode> station_nodes;
    std::vector<Line> lines;
    std::vector<Connection> connections;
-   std::vector<Corner> corners;
+   std::vector<TrackPoint> points;
 };
 
 Map load(std::istream& in);

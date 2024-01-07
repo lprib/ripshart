@@ -8,6 +8,10 @@ station_node.2 300 300
 station_node.3 400 400
 line.0 255 0 0    0
 line.1 0 255 0    1
-connection.0 0 1 0
-connection.1 2 3
-corner.0 200 100
+connection.0 0 1 0 1 2
+connection.1 2 3 3 4
+point.0 100 100
+point.1 200 100
+point.2 200 200
+point.3 300 300
+point.4 400 400

@@ -5,7 +5,8 @@
 #include <fstream>
 
 #include "line.hpp"
-#include "mapfile.hpp"
+#include "map_file.hpp"
+#include "map_render.hpp"
 
 static Line gen_random_line() {
    std::vector<Station> stations{};
@@ -22,24 +23,16 @@ int main(int argc, char** argv) {
    std::ifstream mapfile("/home/liam/programming/raylib_game/ripshart/tube.map");
    auto m = map::load(mapfile);
    map::save(m, std::cout);
-   exit(0);
 
    InitWindow(640, 480, "ripshart unshackled");
    SetTargetFPS(60);
 
-   auto line = gen_random_line();
 
 
    while(!WindowShouldClose()) {
-      if(IsKeyPressed(KEY_SPACE)) {
-         line = gen_random_line();
-      }
-
       BeginDrawing();
       {
-         line.stations.back().pos = GetMousePosition();
-         ClearBackground(WHITE);
-         line.draw();
+         map::render(m);
       }
       EndDrawing();
    }

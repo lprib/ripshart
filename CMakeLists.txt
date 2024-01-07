@@ -11,8 +11,10 @@ add_executable(ripshart_unshackled
     main.cpp
     line.cpp
     line.hpp
-    mapfile.hpp
-    mapfile.cpp
+    map_file.hpp
+    map_file.cpp
+    map_render.hpp
+    map_render.cpp
 )
 
 target_link_libraries(ripshart_unshackled ${RAYLIB_STATIC_LIB_LOCATION})

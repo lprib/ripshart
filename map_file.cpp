@@ -1,4 +1,4 @@
-#include "mapfile.hpp"
+#include "map_file.hpp"
 
 #include <cstdio>
 #include <sstream>
@@ -53,26 +53,26 @@ std::istream& operator>>(std::istream& is, Line& line) {
 
 std::istream& operator>>(std::istream& is, Connection& conn) {
    is >> conn.start >> conn.end;
-   CornerId id;
+   TrackPointId id;
    while(is >> id) {
-      conn.corners.push_back(id);
+      conn.point_ids.push_back(id);
    }
    return is;
 }
 
-std::istream& operator>>(std::istream& is, Corner& corner) {
-   is >> corner.pos.x >> corner.pos.y;
+std::istream& operator>>(std::istream& is, TrackPoint& point) {
+   is >> point.pos.x >> point.pos.y;
    return is;
 }
 
-void check_length(std::string& tag, std::size_t vector_len, Id index) {
+static void check_length(std::string& tag, std::size_t vector_len, Id index) {
    if(index != vector_len) {
       std::cerr << "out of order index: " << index << " " << tag << std::endl;
    }
 }
 
 template <typename T>
-void append_to_vec(
+static void append_to_vec(
    std::vector<T>& vec, std::istream& is, std::string tag, Id index
 ) {
    check_length(tag, vec.size(), index);
@@ -102,8 +102,8 @@ Map load(std::istream& in) {
          append_to_vec<Line>(map.lines, ss, entry_tag, index);
       } else if(entry_tag == "connection") {
          append_to_vec<Connection>(map.connections, ss, entry_tag, index);
-      } else if(entry_tag == "corner") {
-         append_to_vec<Corner>(map.corners, ss, entry_tag, index);
+      } else if(entry_tag == "point") {
+         append_to_vec<TrackPoint>(map.points, ss, entry_tag, index);
       } else {
          std::cerr << "unknown tag " << entry_tag << std::endl;
       }
@@ -148,15 +148,15 @@ void save(Map const& map, std::ostream& out) {
    for(std::size_t i = 0; i < map.connections.size(); ++i) {
       auto& c = map.connections.at(i);
       out << "connection." << i << " " << c.start << " " << c.end;
-      for(auto corner : c.corners) {
-         out << " " << corner;
+      for(auto point_id : c.point_ids) {
+         out << " " << point_id;
       }
       out << std::endl;
    }
 
-   for(std::size_t i = 0; i < map.corners.size(); ++i) {
-      auto& c = map.corners.at(i);
-      out << "corner." << i << " " << c.pos.x << " " << c.pos.y << std::endl;
+   for(std::size_t i = 0; i < map.points.size(); ++i) {
+      auto& c = map.points.at(i);
+      out << "point." << i << " " << c.pos.x << " " << c.pos.y << std::endl;
    }
 }
 
