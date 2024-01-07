@@ -27,11 +27,10 @@ int main(int argc, char** argv) {
    InitWindow(640, 480, "ripshart unshackled");
    SetTargetFPS(60);
 
-
-
    while(!WindowShouldClose()) {
       BeginDrawing();
       {
+         ClearBackground(WHITE);
          map::render(m);
       }
       EndDrawing();
