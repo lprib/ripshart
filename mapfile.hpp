@@ -13,6 +13,7 @@ using Id = unsigned int;
 using NodeId = Id;
 using ConnectionId = Id;
 using StationNodeId = Id;
+using CornerId = Id;
 
 enum class StationStyle {
    Circle,
@@ -36,7 +37,7 @@ struct Line {
 struct Connection {
    StationNodeId start;
    StationNodeId end;
-   std::vector<Vector2> corners;
+   std::vector<CornerId> corners;
 };
 
 struct Corner {
@@ -49,6 +50,7 @@ struct Map {
    std::vector<StationNode> station_nodes;
    std::vector<Line> lines;
    std::vector<Connection> connections;
+   std::vector<Corner> corners;
 };
 
 Map load(std::istream& in);
