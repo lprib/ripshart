@@ -18,12 +18,19 @@ static void render_lines(Map const& map) {
             auto offset_vec = Vector2Scale(down, offset);
 
             for(std::size_t i = 0; i < conn.point_ids.size() - 1; ++i) {
+               auto line_end =
+                  Vector2Add(map.points[conn.point_ids[i]].pos, offset_vec);
+
                DrawLineEx(
-                  Vector2Add(map.points[conn.point_ids[i]].pos, offset_vec),
+                  line_end,
                   Vector2Add(map.points[conn.point_ids[i + 1]].pos, offset_vec),
                   5,
                   line.color
                );
+
+               // for now, to connect corners, draw small circle for rounded
+               // line ends
+               DrawCircleV(line_end, 2.5, line.color);
             }
          }
          ++connection_offset_counter[conn_id];
@@ -48,4 +55,4 @@ void render(Map const& map) {
    render_stations(map);
 }
 
-} // namespace map
+} // namespace tube

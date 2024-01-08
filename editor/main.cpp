@@ -1,7 +1,9 @@
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstdio>
 #include <fstream>
+#include <optional>
 #include <raylib.h>
 #include <vector>
 
@@ -13,22 +15,29 @@ static void handle_key(int keycode);
 static void draw_hud();
 static void draw_grid();
 static Vector2 get_snap_location();
-static void start_connection();
+static void do_connection();
+static void draw_unclaimed_connections();
+static void draw_selected_connection();
 
 enum class UiState {
    Idle,
-   AddingConnection,
+   ConnectionSelectEnd,
+   ConnectionDoPath,
 };
 
 const std::vector<std::string> STATIC_HUD_TEXT = {
    "[-] grid smaller",
    "[=] grid larger",
    "[p] print dump",
+   "[o] open testmap.map",
    "[s] place station",
    "[l] add line",
-   "[]] next line",
-   "[[] prev line",
-   "[c] add/finish connection"
+   "[]] select next line",
+   "[[] select prev line",
+   "[c] add connection",
+   "[,] select prev connection",
+   "[.] select next connection",
+   "[a] add selected connection to selected line"
 };
 
 static constexpr int INIT_WINDOW_WIDTH = 640;
@@ -49,6 +58,7 @@ static bool has_lines = false;
 static std::size_t current_line_idx = 0;
 static UiState state = UiState::Idle;
 static std::string popup_msg = "";
+static tube::ConnectionId selected_connection_id;
 
 tube::Map map{};
 
@@ -78,6 +88,9 @@ int main(int argc, char** argv) {
          tube::render(map);
          draw_grid();
          draw_hud();
+         draw_unclaimed_connections();
+         draw_selected_connection();
+
          DrawCircleV(get_snap_location(), 10, SNAP_POS_COLOR);
       }
       EndDrawing();
@@ -100,6 +113,18 @@ static void handle_key(int keycode) {
    } break;
    case KEY_P: {
       tube::save(map, std::cout);
+   } break;
+   case KEY_O: {
+      std::ifstream file(
+         "/home/liam/programming/raylib_game/ripshart/testmap.map"
+      );
+      map = tube::load(file);
+      
+      // reset state
+      has_lines = map.lines.size() != 0;
+      selected_connection_id = 0;
+      current_line_idx = 0;
+      state = UiState::Idle;
    } break;
    case KEY_S: {
       auto node_id = map.station_nodes.size();
@@ -126,7 +151,37 @@ static void handle_key(int keycode) {
       }
    } break;
    case KEY_C: {
-      start_connection();
+      do_connection();
+   } break;
+   case KEY_SPACE: {
+      if(state == UiState::ConnectionDoPath) {
+         // todo re-use old points?
+         auto new_point_id = map.points.size();
+         map.points.push_back(tube::TrackPoint{get_snap_location()});
+         map.connections.back().point_ids.push_back(new_point_id);
+      }
+   } break;
+   case KEY_ENTER: {
+      if(state == UiState::ConnectionDoPath) {
+         state = UiState::Idle;
+      }
+   } break;
+   case KEY_COMMA: {
+      if(selected_connection_id != 0) {
+         --selected_connection_id;
+      }
+   } break;
+   case KEY_PERIOD: {
+      if(selected_connection_id < map.connections.size() - 1) {
+         ++selected_connection_id;
+      }
+   } break;
+   case KEY_A: {
+      if((selected_connection_id < map.connections.size()) && has_lines) {
+         map.lines[current_line_idx].connection_ids.push_back(
+            selected_connection_id
+         );
+      }
    } break;
    }
 }
@@ -134,7 +189,7 @@ static void handle_key(int keycode) {
 static void draw_lines_hud() {
    auto x = window_width - 50;
    for(std::size_t i = 0; i < map.lines.size(); ++i) {
-      auto rec = Rectangle{x, 10 + i * 30, 40, 20};
+      auto rec = Rectangle{(float)x, (float)(10 + i * 30), 40, 20};
       DrawRectangleRec(rec, map.lines[i].color);
       if(i == current_line_idx) {
          DrawRectangleLinesEx(rec, 5, BLACK);
@@ -162,8 +217,11 @@ static void draw_hud() {
    case UiState::Idle:
       state_str = "idle";
       break;
-   case UiState::AddingConnection:
-      state_str = "adding connection";
+   case UiState::ConnectionSelectEnd:
+      state_str = "[c] select logical end station";
+      break;
+   case UiState::ConnectionDoPath:
+      state_str = "[space] select path nodes, [enter] finish";
       break;
    }
 
@@ -199,29 +257,100 @@ static Vector2 get_snap_location() {
    return Vector2{round_to(mouse.x, grid_size), round_to(mouse.y, grid_size)};
 }
 
-static void start_connection() {
+static std::optional<tube::StationId> get_mouseover_station_id() {
    constexpr float EPS = 0.1;
-
    auto snap = get_snap_location();
 
-   if(state == UiState::AddingConnection) {
-      state = UiState::Idle;
-   } else if(state == UiState::Idle) {
-      int node_idx = -1;
-      for(std::size_t i = 0; i < map.station_nodes.size(); ++i) {
-         auto& node = map.station_nodes[i];
-         if(std::abs(node.pos.x - snap.x) < EPS &&
-            std::abs(node.pos.y - snap.y) < EPS) {
-            node_idx = i;
-            break;
+   std::optional<tube::NodeId> node_id;
+
+   for(std::size_t i = 0; i < map.station_nodes.size(); ++i) {
+      auto& node = map.station_nodes[i];
+      if(std::abs(node.pos.x - snap.x) < EPS &&
+         std::abs(node.pos.y - snap.y) < EPS) {
+         node_id = i;
+         break;
+      }
+   }
+
+   if(node_id.has_value()) {
+      for(std::size_t i = 0; i < map.stations.size(); ++i) {
+         auto& nodes = map.stations[i].nodes;
+         if(std::find(nodes.begin(), nodes.end(), node_id.value()) !=
+            nodes.end()) {
+            return static_cast<tube::StationId>(i);
          }
       }
+   }
 
-      if(node_idx == -1) {
+   return std::nullopt;
+}
+
+static void do_connection() {
+   if(state == UiState::ConnectionSelectEnd) {
+      auto end_station = get_mouseover_station_id();
+      if(end_station.has_value()) {
+         map.connections.back().logical_end_id = end_station.value();
+         state = UiState::ConnectionDoPath;
+      } else {
+         popup_msg = "must end at station node";
+      }
+
+   } else if(state == UiState::Idle) {
+      auto start_station = get_mouseover_station_id();
+      if(start_station.has_value()) {
+         map.connections.push_back(
+            tube::Connection{start_station.value(), start_station.value(), {}}
+         );
+      } else {
          popup_msg = "must start at station node";
          return;
       }
 
-      state = UiState::AddingConnection;
+      state = UiState::ConnectionSelectEnd;
+   }
+}
+
+static void draw_connection(
+   tube::Connection const& connection, tube::Map const& map,
+   std::function<void(Vector2, Vector2)> draw
+) {
+   if(connection.point_ids.size() > 1) {
+      for(std::size_t i = 0; i < connection.point_ids.size() - 1; ++i) {
+         draw(
+            map.points[connection.point_ids[i]].pos,
+            map.points[connection.point_ids[i + 1]].pos
+         );
+      }
+   }
+}
+
+static void draw_unclaimed_connections() {
+   for(std::size_t conn_id = 0; conn_id < map.connections.size(); ++conn_id) {
+      auto& connection = map.connections[conn_id];
+      bool used = false;
+      for(auto& line : map.lines) {
+         if(std::find(
+               line.connection_ids.begin(),
+               line.connection_ids.end(),
+               conn_id
+            ) != line.connection_ids.end()) {
+            used = true;
+         }
+      }
+      if(!used) {
+         draw_connection(connection, map, [](auto a, auto b) {
+            DrawLineV(a, b, HUD_COLOR);
+         });
+      }
+   }
+}
+
+static void draw_selected_connection() {
+   if(selected_connection_id < map.connections.size()) {
+      draw_connection(
+         map.connections[selected_connection_id],
+         map,
+         [](auto a, auto b) { DrawLineEx(a, b, 10, SNAP_POS_COLOR); }
+      );
    }
 }

@@ -1,0 +1,88 @@
+station.0 circle 0
+station.1 circle 1
+station.2 circle 2
+station.3 circle 3
+station.4 circle 4
+station.5 circle 5
+station.6 circle 6
+station.7 circle 7
+station.8 circle 8
+station.9 circle 9
+station_node.0 100 400
+station_node.1 400 400
+station_node.2 500 600
+station_node.3 50 550
+station_node.4 500 300
+station_node.5 500 200
+station_node.6 500 100
+station_node.7 225 525
+station_node.8 600 300
+station_node.9 900 300
+line.0 149 200 172 0 1
+line.1 196 24 84 2 3 4 5 0 7 8
+line.2 19 244 68 6
+line.3 244 142 43 0 1
+line.4 50 70 95
+line.5 83 193 123
+line.6 22 235 42
+line.7 151 115 53
+line.8 127 255 49
+line.9 15 152 120 5 4 3
+line.10 58 41 64
+connection.0 0 1 0 1
+connection.1 1 2 2 3 4 5
+connection.2 3 0 6 7 8
+connection.3 1 4 9 10 11 12
+connection.4 4 5 13 14
+connection.5 5 6 15 16
+connection.6 3 7 17 18 19 20 21 22 23 24 25 26 27 28
+connection.7 8 9 29 30 31 32 33 34 35 36 37 38 39 40 41 42
+connection.8 2 8 43 44 45 46 47
+point.0 100 400
+point.1 400 400
+point.2 400 400
+point.3 450 400
+point.4 500 450
+point.5 500 600
+point.6 50 550
+point.7 50 450
+point.8 100 400
+point.9 400 400
+point.10 450 400
+point.11 500 350
+point.12 500 300
+point.13 500 300
+point.14 500 200
+point.15 500 200
+point.16 500 100
+point.17 50 550
+point.18 90 550
+point.19 110 530
+point.20 110 510
+point.21 130 490
+point.22 190 490
+point.23 200 500
+point.24 270 500
+point.25 280 510
+point.26 270 520
+point.27 250 520
+point.28 225 525
+point.29 600 300
+point.30 625 300
+point.31 650 325
+point.32 650 350
+point.33 675 375
+point.34 700 375
+point.35 725 350
+point.36 725 250
+point.37 750 225
+point.38 775 225
+point.39 800 250
+point.40 800 275
+point.41 825 300
+point.42 900 300
+point.43 500 600
+point.44 550 600
+point.45 575 575
+point.46 575 325
+point.47 600 300
